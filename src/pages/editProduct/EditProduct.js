@@ -5,23 +5,24 @@ import Header from "../../components/header/Header";
 
 const EditProduct = (props) => {
   const { match } = props;
+
   const id = match.params.id;
   const history = useHistory();
-  const [items, setItems] = useState([]);
+  console.log(history);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     image: "",
   });
-  const filterProduct = items.find((product) => product.id === id);
-  console.log(filterProduct);
 
-  const getList = async (filterProduct) => {
-    console.log(filterProduct);
+  const getList = async () => {
     try {
       const resp = await getProducts();
-      setItems(resp.data.eventos);
-      const { name, price, image } = filterProduct;
+      const events = resp.data.eventos;
+      console.log(events);
+      const item = events.find((e) => e.id === id);
+      console.log(item);
+      const { name, price, image } = item;
       setFormData({
         name: name,
         price: price,
@@ -34,10 +35,8 @@ const EditProduct = (props) => {
   const goToInit = () => history.push("/");
 
   useEffect(() => {
-    getList(filterProduct);
+    getList();
   }, []);
-
-  // editProductApi(formData.id);  mandando el id actualiza los cambios
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,13 +46,15 @@ const EditProduct = (props) => {
     });
   };
 
-  const update = async () => {
+  const update = async (e) => {
+    e.preventDefault();
+
     try {
-      await editProductApi(formData.id);
-      history.push("/");
+      await editProductApi(id, formData);
     } catch (err) {
       console.log(err);
     }
+    history.push("/");
   };
   return (
     <div>
@@ -61,7 +62,7 @@ const EditProduct = (props) => {
       <div className="container-fluid mt-4">
         <div className="card">
           <div className="card-body">
-            <form>
+            <form onSubmit={update}>
               <div className="row">
                 <div className="col mb-4 hola">
                   <img
@@ -116,11 +117,7 @@ const EditProduct = (props) => {
               <div className="row">
                 <div className="col-sm-12">
                   <div className="label">
-                    <button
-                      type="submit"
-                      className="btn btn-primary text-left"
-                      onClick={update}
-                    >
+                    <button type="submit" className="btn btn-primary text-left">
                       <span>Submit</span>
                     </button>
                     <button className="btn btn-light mx-4" onClick={goToInit}>

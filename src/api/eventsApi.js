@@ -15,10 +15,11 @@ export const createProdutsApi = async (data) => {
   });
 };
 
-export const editProductApi = async (id) => {
+export const editProductApi = async (id, data) => {
   return await axios({
     method: "put",
     url: `https://funko-app.herokuapp.com/api/events/${id}`,
+    data,
   });
 };
 
